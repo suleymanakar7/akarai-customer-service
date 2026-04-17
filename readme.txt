@@ -1,6 +1,6 @@
-=== AI Customer Service & Analytics ===
-Contributors: (slymn)
-Tags: ai, chat, openai, gpt, customer service, analytics, lead generation
+=== AkarAi Customer Service ===
+Contributors: akarcayazilim, slymn
+Tags: ai, chat, openai, gpt, customer service, analytics, lead generation, rag, semantic search
 Requires at least: 5.0
 Tested up to: 6.4
 Requires PHP: 7.4
@@ -8,54 +8,60 @@ Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Professional AI-powered customer service widget for WordPress. Includes Semantic Search (RAG), Token Analytics, and Lead Generation.
+Professional AI-powered customer service widget with Semantic Search (RAG), Token Analytics, and Lead Generation.
 
 == Description ==
 
-**AI Customer Service & Analytics** is a premium-grade WordPress plugin that transforms your website into an intelligent assistant. Using OpenAI's world-leading AI models and Semantic Search (RAG), it understands your website's content and provides accurate, human-like responses to your visitors.
+**AkarAi Customer Service** is a premium-grade WordPress plugin that transforms your website into an intelligent assistant. Powered by OpenAI's world-leading AI models and Semantic Search (RAG), it understands your website's content and provides accurate, human-like responses to your visitors.
 
-Unlike traditional keyword-based bots, this plugin uses **Vector Embeddings** to understand the meaning behind customer questions, ensuring it finds the right information even if the exact keywords are missing.
+Unlike traditional keyword-based bots, AkarAi uses **Vector Embeddings** to understand the meaning behind customer questions, ensuring it finds the right information even if the exact keywords are missing.
 
 === Key Features ===
 
-*   **Semantic Search (RAG):** Uses OpenAI Embeddings to understand content intent.
-*   **Advanced Indexing:** Automatically chunks and indexes your Posts, Pages, and Custom Post Types.
-*   **Analytics Dashboard:** Track token usage, conversation volume, and lead generation trends.
-*   **Lead Generation:** Integrated form to capture visitor names and phones with KVKK compliance.
-*   **Premium UI:** Modern, elegant Chat Widget with a "glassmorphism" design and smooth animations.
-*   **Cost Management:** Shows estimated operational costs based on token usage.
-*   **Manual Knowledge Base:** Add custom facts directly to the AI's memory.
+*   **Semantic Search (RAG):** Uses OpenAI Embeddings to understand content intent with high precision.
+*   **Advanced Indexing:** Automatically chunks and indexes your Posts, Pages, and Custom Post Types with batch progress tracking.
+*   **Analytics Dashboard:** Visualise token usage, conversation volume, and lead generation trends.
+*   **Lead Generation:** Integrated form to capture visitor names and phones with customizable privacy policy compliance.
+*   **Multi-Language UI:** Force the widget to Turkish or English, or follow the site default.
+*   **Premium UI:** Elegant "glassmorphism" Chat Widget design with smooth animations and customizable primary colors.
+*   **Cost Management:** Monitor operational costs based on real-time token usage.
+*   **Manual Knowledge Base:** Directly add facts to the AI's memory for specific business needs.
 
 == Installation ==
 
 1. Upload the plugin folder to the `/wp-content/plugins/` directory.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
-3. Go to **AI Müşteri -> Settings** to enter your OpenAI API Key.
-4. Go to **AI Müşteri -> Site İndeksleme** and start a scan for your content.
+3. Go to **AkarAi > Settings** to enter your OpenAI API Key.
+4. Go to **AkarAi > Indexing** to scan and index your site content.
 
 == Frequently Asked Questions ==
 
 = Does it require an OpenAI API Key? =
-Yes, you need a valid OpenAI API key to use the chat and embedding features.
+Yes, a valid OpenAI API key is required for the chat and embedding features.
 
 = Is it mobile-friendly? =
-Absolutely. The chat widget is fully responsive and works perfectly on all devices.
+Yes. The chat widget is fully responsive and optimized for mobile interactions.
+
+= Does it support Turkish? =
+Yes, AkarAi fully supports both Turkish and English. You can force the language in the settings.
 
 == Screenshots ==
 
-1. Statistics Dashboard showing token usage and trends.
-2. Chat Widget integrated with site content.
-3. Content Indexer with batch progress tracking.
+1. Analytics Dashboard showing usage trends.
+2. The AkarAi Chat Widget in action.
+3. Site Indexing interface with progress tracking.
 
 == Changelog ==
 
 = 1.0.3 =
-*   Switched to Semantic Search (Embeddings) for better accuracy.
-*   Added Batch Indexing with Progress Bar.
-*   Improved Chat Widget UI aesthetics.
+*   Rebranded as AkarAi Customer Service.
+*   Added Multi-Language support (EN/TR selection).
+*   Added "About" page with support links.
+*   Bug fixes for PHP 8.x compatibility.
+*   Switched to Semantic Search (Embeddings) as standard.
 
 = 1.0.2 =
 *   Added Analytics Dashboard and token tracking.
 
 = 1.0.1 =
-*   Basic Chat Widget and keyword indexing.
+*   Initial release with basic chat and keyword indexing.
