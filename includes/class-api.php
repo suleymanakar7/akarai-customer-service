@@ -27,12 +27,20 @@ class AI_MH_API {
             return new WP_Error('missing_fields', __( 'Missing required fields.', 'akarai-customer-service' ), ['status' => 400]);
         }
 
-        $lang = $settings['widget_language'] ?? 'auto';
-        $title = ($lang === 'tr') ? 'Ziyaretçi' : __( 'Visitor', 'akarai-customer-service' );
+        $name = sanitize_text_field($params['name']);
+        $first_name = explode(' ', $name)[0];
+        
+        $settings = get_option('akarai_cs_settings');
+        $lang_setting = $settings['widget_language'] ?? 'auto';
+        $current_locale = get_locale();
+        $is_tr = ($lang_setting === 'tr' || ($lang_setting === 'auto' && str_starts_with($current_locale, 'tr')));
+        
+        $api_key = $settings['api_key'] ?? '';
+        $title = ($is_tr) ? 'Ziyaretçi' : __( 'Visitor', 'akarai-customer-service' );
 
         if ($api_key) {
             $system_instr = 'You are a linguistic expert. Given a first name, determine the appropriate formal title (Mr., Ms., or Mx.) in English. Return ONLY the title word. If unsure, return "Visitor".';
-            if ($lang === 'tr') {
+            if ($is_tr) {
                 $system_instr = 'Sen bir dil uzmanısın. Verilen isme göre en uygun hitap şeklini (Bey, Hanım) Türkçe olarak belirle. Sadece tek bir kelime döndür. Emin değilsen "Ziyaretçi" döndür.';
             }
 
@@ -88,7 +96,7 @@ class AI_MH_API {
             return new WP_Error('db_error', __( 'Database error occurred.', 'akarai-customer-service' ), ['status' => 500]);
         }
 
-        if ($lang === 'tr') {
+        if ($is_tr) {
             $greeting = sprintf( 'Hoş geldiniz %s %s, size bugün nasıl yardımcı olabilirim?', $first_name, $title );
         } else {
             $greeting = sprintf( __( 'Welcome %s %s, how can I help you today?', 'akarai-customer-service' ), $first_name, $title );
@@ -125,8 +133,11 @@ class AI_MH_API {
         $lead = $wpdb->get_row($wpdb->prepare(
             "SELECT l.name FROM $table_leads l JOIN $table_convs c ON l.id = c.lead_id WHERE c.id = %d", $conv_id
         ));
-        $lang = $settings['widget_language'] ?? 'auto';
-        $user_name = $lead ? $lead->name : (($lang === 'tr') ? 'Ziyaretçi' : __( 'Visitor', 'akarai-customer-service' ));
+        $lang_setting = $settings['widget_language'] ?? 'auto';
+        $current_locale = get_locale();
+        $is_tr = ($lang_setting === 'tr' || ($lang_setting === 'auto' && str_starts_with($current_locale, 'tr')));
+        
+        $user_name = $lead ? $lead->name : (($is_tr) ? 'Ziyaretçi' : __( 'Visitor', 'akarai-customer-service' ));
 
         // 2. Save User Message
         $table_msgs = $wpdb->prefix . 'ai_mh_messages';
@@ -213,9 +224,39 @@ class AI_MH_API {
             $context .= "Topic: " . $item['post_title'] . "\nInfo: " . $item['content'] . "\n---\n";
         }
 
-        // 7. OpenAI Request
-        $lang_instr = ($lang === 'tr') ? "IMPORTANT: Respond ONLY in Turkish." : "IMPORTANT: Respond in the language used by the user or force English if needed.";
-        $system_prompt = ($settings['system_prompt'] ?? '') . "\n\n" . $lang_instr . "\nUser Name: " . $user_name . "\nCONVERSATION RULES:\n1. We have already greeted the user, do not say hello again.\n2. Do NOT use robotic patterns like 'Name: Answer'.\n3. Use the user's name naturally in the sentence.\n4. Speak as a professional customer service agent: polite, helpful, and concise.\n5. KEEP ANSWERS SHORT: Max 2-3 sentences. Only provide essential info.\n\nWEBSITE KNOWLEDGE (Answer ONLY based on this info, if unknown ask for contact details):\n" . $context;
+        // 7. Dynamic Persona & Context Construction
+        $tone = $settings['tone_of_voice'] ?? 'professional';
+        $tone_instr = "Style: Professional, polite, and direct.";
+        if ($tone === 'friendly') {
+            $tone_instr = "Style: Friendly, warm, and conversational. Use a sisterly/brotherly tone (Samimi).";
+        } elseif ($tone === 'boutique') {
+            $tone_instr = "Style: Boutique, premium, and very welcoming. Focus on personal care and attention.";
+        } elseif ($tone === 'minimalist') {
+            $tone_instr = "Style: Extremely concise and minimalist. Only the core facts.";
+        }
+
+        $biz_name = $settings['business_name'] ?? get_bloginfo('name');
+        $biz_phone = $settings['business_phone'] ?? '';
+        $biz_address = $settings['business_address'] ?? '';
+        $custom_closure = $settings['custom_closure'] ?? '';
+        $persona_custom = $settings['personality_instructions'] ?? '';
+
+        $lang_instr = ($is_tr) ? "IMPORTANT: Respond ONLY in Turkish." : "IMPORTANT: Respond in the language used by the user.";
+        
+        $system_prompt = "You are the official AI assistant of {$biz_name}.\n" .
+            "TONE RULES:\n" . $tone_instr . "\n" .
+            "PERSONALITY RULES:\n" . $persona_custom . "\n" .
+            "CONVERSATION RULES:\n" .
+            "1. Do NOT use robotic patterns like 'Name: Answer'.\n" .
+            "2. Use the user's name ({$user_name}) naturally in the sentence.\n" .
+            "3. KEEP ANSWERS SHORT: Max 2-3 sentences unless asked for detail.\n" .
+            "4. IMPORTANT: If the information is NOT in the knowledge base below, NEVER say 'Sitede bu bilgi yok' or 'I don't have this info'.\n" .
+            "   Instead, say: 'Bu konuda çalışma arkadaşlarımızla iletişime geçmeniz daha doğru olacaktır.'\n" .
+            "5. If you redirect the user, always provide our contact details if they are known:\n" .
+            "   Phone: {$biz_phone}, Address: {$biz_address}.\n" .
+            "6. CLOSING RULE: {$custom_closure}\n\n" .
+            $lang_instr . "\n\n" .
+            "WEBSITE KNOWLEDGE (Answer ONLY based on this info):\n" . $context;
         
         $response = wp_remote_post('https://api.openai.com/v1/chat/completions', [
             'headers' => [

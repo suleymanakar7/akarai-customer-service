@@ -2,7 +2,7 @@
 /**
  * Plugin Name: AkarAi Customer Service
  * Description: Professional AI-powered customer service widget with Semantic Search (RAG), Token Analytics, and Lead Generation.
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: Akarca Yazılım
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 
 define('AKARAI_CS_PATH', plugin_dir_path(__FILE__));
 define('AKARAI_CS_URL', plugin_dir_url(__FILE__));
-define('AKARAI_CS_VERSION', '1.0.3');
+define('AKARAI_CS_VERSION', '1.0.4');
 
 // Backward compatibility or internal usage alias
 if (!defined('AI_MH_VERSION')) define('AI_MH_VERSION', AKARAI_CS_VERSION);

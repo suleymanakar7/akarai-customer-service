@@ -106,7 +106,13 @@ class AI_MH_Admin {
                 'widget_language' => sanitize_text_field($_POST['widget_language'] ?? 'auto'),
                 'faq_1' => sanitize_text_field($_POST['faq_1'] ?? ''),
                 'faq_2' => sanitize_text_field($_POST['faq_2'] ?? ''),
-                'faq_3' => sanitize_text_field($_POST['faq_3'] ?? '')
+                'faq_3' => sanitize_text_field($_POST['faq_3'] ?? ''),
+                'business_name' => sanitize_text_field($_POST['business_name'] ?? ''),
+                'business_phone' => sanitize_text_field($_POST['business_phone'] ?? ''),
+                'business_address' => sanitize_textarea_field($_POST['business_address'] ?? ''),
+                'tone_of_voice' => sanitize_text_field($_POST['tone_of_voice'] ?? 'professional'),
+                'personality_instructions' => sanitize_textarea_field($_POST['personality_instructions'] ?? ''),
+                'custom_closure' => sanitize_text_field($_POST['custom_closure'] ?? '')
             ];
             update_option('akarai_cs_settings', $settings);
             echo '<div class="updated"><p>' . __( 'Settings saved.', 'akarai-customer-service' ) . '</p></div>';
@@ -211,13 +217,21 @@ class AI_MH_Admin {
     public function handle_prepare_indexing() {
         check_ajax_referer('ai_mh_admin_nonce', 'nonce');
         global $wpdb;
-        $table_knowledge = $wpdb->prefix . 'ai_mh_knowledge';
         
-        $post_types = isset($_POST['post_types']) ? array_map('sanitize_text_field', $_POST['post_types']) : ['post', 'page'];
+        // Sanitize post types array
+        $post_types = ['post', 'page'];
+        if (isset($_POST['post_types']) && is_array($_POST['post_types'])) {
+            $post_types = array_map('sanitize_text_field', $_POST['post_types']);
+        }
+
         $is_full_scan = isset($_POST['full_scan']) && $_POST['full_scan'] === 'true';
 
         if ($is_full_scan) {
-            $wpdb->query("DELETE FROM $table_knowledge WHERE post_id != 0");
+            // Use prepared query for security scan compliance
+            $wpdb->query( $wpdb->prepare( 
+                "DELETE FROM {$wpdb->prefix}ai_mh_knowledge WHERE post_id != %d", 
+                0 
+            ));
         }
 
         $posts = get_posts([
@@ -246,8 +260,25 @@ class AI_MH_Admin {
         if (!$post) wp_send_json_error( __( 'Post not found', 'akarai-customer-service' ) );
 
         // Render content
-        $content = apply_filters('the_content', $post->post_content);
-        $content = strip_tags($content);
+        $is_deep_scan = isset($_POST['deep_scan']) && $_POST['deep_scan'] === 'true';
+        $content = "";
+
+        if ($is_deep_scan) {
+            $url = get_permalink($post->ID);
+            $response = wp_remote_get($url, ['timeout' => 20]);
+            if (!is_wp_error($response)) {
+                $html = wp_remote_retrieve_body($response);
+                // Remove script and style elements
+                $html = preg_replace('/<(script|style)\b[^>]*>(.*?)<\/\1>/is', '', $html);
+                $content = strip_tags($html);
+            }
+        }
+
+        if (empty($content)) {
+            $content = apply_filters('the_content', $post->post_content);
+            $content = strip_tags($content);
+        }
+
         $content = preg_replace('/\s+/', ' ', $content);
         $content = trim($content);
         

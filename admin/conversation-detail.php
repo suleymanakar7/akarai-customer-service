@@ -1,16 +1,5 @@
 <?php if (!defined('ABSPATH')) exit; ?>
 <div class="wrap ai-mh-admin">
-    <h1>Sohbet Detayı: <?php echo esc_html($conversation->name . ' ' . $conversation->surname); ?></h1>
-    <a href="<?php echo admin_url('admin.php?page=ai-mh-conversations'); ?>" class="button">&larr; Sohbet Listesine Dön</a>
-
-    <div class="ai-mh-conversation-container">
-        <div class="ai-mh-lead-info-card">
-            <h2>Müşteri Künyesi</h2>
-            <div class="ai-mh-stat">
-                <span class="stat-label">Ad Soyad:</span>
-                <span class="stat-value"><?php echo esc_html($conversation->name . ' ' . $conversation->surname); ?></span>
-            </div>
-            <div class="ai-mh-stat">
     <a href="<?php echo admin_url('admin.php?page=akarai-cs-conversations'); ?>" class="button mb-20">&larr; <?php _e( 'Back to List', 'akarai-customer-service' ); ?></a>
     
     <h1><?php printf( __( 'Conversation Detail: %s', 'akarai-customer-service' ), esc_html($conversation->name . ' ' . $conversation->surname) ); ?></h1>
@@ -23,7 +12,7 @@
                         <div class="chat-bubble <?php echo $msg->role === 'assistant' ? 'bubble-bot' : 'bubble-user'; ?>">
                             <div class="bubble-info">
                                 <strong><?php echo $msg->role === 'assistant' ? 'AkarAi' : esc_html($conversation->name); ?></strong>
-                                <small><?php echo $msg->created_at; ?></small>
+                                <small><?php echo date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($msg->created_at)); ?></small>
                             </div>
                             <div class="bubble-content">
                                 <?php echo nl2br(esc_html($msg->content)); ?>
@@ -45,7 +34,7 @@
                 <p><strong><?php _e( 'Full Name:', 'akarai-customer-service' ); ?></strong> <?php echo esc_html($conversation->name . ' ' . $conversation->surname); ?></p>
                 <p><strong><?php _e( 'Phone:', 'akarai-customer-service' ); ?></strong> <?php echo esc_html($conversation->phone); ?></p>
                 <p><strong><?php _e( 'Status:', 'akarai-customer-service' ); ?></strong> <?php echo esc_html($conversation->status); ?></p>
-                <p><strong><?php _e( 'Start:', 'akarai-customer-service' ); ?></strong> <?php echo $conversation->started_at; ?></p>
+                <p><strong><?php _e( 'Start:', 'akarai-customer-service' ); ?></strong> <?php echo date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($conversation->started_at)); ?></p>
             </div>
         </div>
     </div>

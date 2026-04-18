@@ -27,10 +27,14 @@ class AI_MH_Public {
 
     public function enqueue_assets() {
         wp_enqueue_style('akarai-cs-widget-css', AKARAI_CS_URL . 'public/widget.css', [], AKARAI_CS_VERSION);
+        wp_enqueue_script('akarai-cs-widget-js', AKARAI_CS_URL . 'public/widget.js', [], AKARAI_CS_VERSION, true);
+
         $settings = get_option('akarai_cs_settings');
         if (!is_array($settings)) $settings = [];
         
-        $lang = $settings['widget_language'] ?? 'auto';
+        $lang_setting = $settings['widget_language'] ?? 'auto';
+        $current_locale = get_locale();
+        $is_tr = ($lang_setting === 'tr' || ($lang_setting === 'auto' && str_starts_with($current_locale, 'tr')));
 
         $i18n = [
             'start_chat' => __( 'Start Chat', 'akarai-customer-service' ),
@@ -43,8 +47,8 @@ class AI_MH_Public {
             'faq_title' => __( 'Frequently Asked Questions', 'akarai-customer-service' ),
         ];
 
-        // Override if forced to Turkish
-        if ($lang === 'tr') {
+        // Override if forced to Turkish or detected as Turkish in auto mode
+        if ($is_tr) {
             $i18n = [
                 'start_chat' => 'Sohbeti Başlat',
                 'name_placeholder' => 'Adınız Soyadınız',
@@ -60,7 +64,7 @@ class AI_MH_Public {
         wp_localize_script('akarai-cs-widget-js', 'akarai_cs_obj', [
             'rest_url' => esc_url_raw(set_url_scheme(rest_url('ai-mh/v1/'))),
             'bot_name' => $settings['bot_name'] ?? 'Agent AkarAi',
-            'welcome_msg' => $settings['welcome_msg'] ?? ($lang === 'tr' ? 'Merhaba! Size nasıl yardımcı olabilirim?' : __( 'Hi! How can I help you today?', 'akarai-customer-service' )),
+            'welcome_msg' => $settings['welcome_msg'] ?? ($is_tr ? 'Merhaba! Size nasıl yardımcı olabilirim?' : __( 'Hi! How can I help you today?', 'akarai-customer-service' )),
             'primary_color' => $settings['primary_color'] ?? '#2563eb',
             'position' => $settings['position'] ?? 'left',
             'faqs' => [
@@ -75,12 +79,16 @@ class AI_MH_Public {
     public function render_widget() {
         $settings = get_option('akarai_cs_settings');
         if (!is_array($settings)) $settings = [];
-        $lang = $settings['widget_language'] ?? 'auto';
-        $online_text = ($lang === 'tr') ? 'Çevrimiçi' : __( 'Online', 'akarai-customer-service' );
-        $form_text = ($lang === 'tr') ? 'Lütfen başlamak için bilgilerinizi girin:' : __( 'Please enter your information to start:', 'akarai-customer-service' );
-        $name_text = ($lang === 'tr') ? 'Adınız Soyadınız' : __( 'Your Full Name', 'akarai-customer-service' );
-        $phone_text = ($lang === 'tr') ? 'Telefon Numaranız' : __( 'Your Phone Number', 'akarai-customer-service' );
-        $send_text = ($lang === 'tr') ? 'Gönder' : __( 'Send', 'akarai-customer-service' );
+        
+        $lang_setting = $settings['widget_language'] ?? 'auto';
+        $current_locale = get_locale();
+        $is_tr = ($lang_setting === 'tr' || ($lang_setting === 'auto' && str_starts_with($current_locale, 'tr')));
+
+        $online_text = ($is_tr) ? 'Çevrimiçi' : __( 'Online', 'akarai-customer-service' );
+        $form_text = ($is_tr) ? 'Lütfen başlamak için bilgilerinizi girin:' : __( 'Please enter your information to start:', 'akarai-customer-service' );
+        $name_text = ($is_tr) ? 'Adınız Soyadınız' : __( 'Your Full Name', 'akarai-customer-service' );
+        $phone_text = ($is_tr) ? 'Telefon Numaranız' : __( 'Your Phone Number', 'akarai-customer-service' );
+        $send_text = ($is_tr) ? 'Gönder' : __( 'Send', 'akarai-customer-service' );
         ?>
         <div id="ai-mh-widget" class="ai-mh-position-<?php echo esc_attr($settings['position'] ?? 'left'); ?>">
             <div id="ai-mh-button" style="background-color: <?php echo esc_attr($settings['primary_color'] ?? '#2563eb'); ?>">
@@ -89,7 +97,7 @@ class AI_MH_Public {
 
             <div id="ai-mh-attention-bubble">
                 <span id="ai-mh-attention-close">&times;</span>
-                <?php echo esc_html($settings['welcome_msg'] ?? ($lang === 'tr' ? 'Merhaba! Size nasıl yardımcı olabilirim?' : __( 'Hi! How can I help you?', 'akarai-customer-service' ))); ?> 👋
+                <?php echo esc_html($settings['welcome_msg'] ?? ($is_tr ? 'Merhaba! Size nasıl yardımcı olabilirim?' : __( 'Hi! How can I help you?', 'akarai-customer-service' ))); ?> 👋
             </div>
 
             <div id="ai-mh-chat-window" style="display: none;">
@@ -121,19 +129,19 @@ class AI_MH_Public {
                             <input type="checkbox" id="ai-mh-kvkk-check">
                             <span class="ai-mh-agreement-text">
                                 <?php if (!empty($settings['kvkk_url'])): ?>
-                                    <a href="<?php echo esc_url($settings['kvkk_url']); ?>" target="_blank"><?php echo esc_html($settings['kvkk_text'] ?? ($lang === 'tr' ? 'Gizlilik politikasını kabul ediyorum' : __( 'I agree to the privacy policy', 'akarai-customer-service' ))); ?></a>
+                                    <a href="<?php echo esc_url($settings['kvkk_url']); ?>" target="_blank"><?php echo esc_html($settings['kvkk_text'] ?? ($is_tr ? 'Gizlilik politikasını kabul ediyorum' : __( 'I agree to the privacy policy', 'akarai-customer-service' ))); ?></a>
                                 <?php else: ?>
-                                    <?php echo esc_html($settings['kvkk_text'] ?? ($lang === 'tr' ? 'Gizlilik politikasını kabul ediyorum' : __( 'I agree to the privacy policy', 'akarai-customer-service' ))); ?>
+                                    <?php echo esc_html($settings['kvkk_text'] ?? ($is_tr ? 'Gizlilik politikasını kabul ediyorum' : __( 'I agree to the privacy policy', 'akarai-customer-service' ))); ?>
                                 <?php endif; ?>
                             </span>
                         </label>
                     </div>
 
-                    <button id="ai-mh-start-chat" style="background-color: <?php echo esc_attr($settings['primary_color'] ?? '#2563eb'); ?>"><?php echo esc_html($lang === 'tr' ? 'Sohbeti Başlat' : __( 'Start Chat', 'akarai-customer-service' )); ?></button>
+                    <button id="ai-mh-start-chat" style="background-color: <?php echo esc_attr($settings['primary_color'] ?? '#2563eb'); ?>"><?php echo esc_html($is_tr ? 'Sohbeti Başlat' : __( 'Start Chat', 'akarai-customer-service' )); ?></button>
                 </div>
 
                 <div id="ai-mh-input-area" style="display: none;">
-                    <input type="text" id="ai-mh-user-input" placeholder="<?php echo esc_attr($lang === 'tr' ? 'Mesajınızı yazın...' : __( 'Type your message...', 'akarai-customer-service' )); ?>">
+                    <input type="text" id="ai-mh-user-input" placeholder="<?php echo esc_attr($is_tr ? 'Mesajınızı yazın...' : __( 'Type your message...', 'akarai-customer-service' )); ?>">
                     <button id="ai-mh-send" title="<?php echo esc_attr($send_text); ?>">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                     </button>

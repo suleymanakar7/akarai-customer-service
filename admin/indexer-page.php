@@ -27,6 +27,8 @@
                         <label><strong><?php _e( 'Scan Mode:', 'akarai-customer-service' ); ?></strong></label><br>
                         <label><input type="radio" name="scan_type" value="incremental" checked> <?php _e( 'Incremental (New/Updated only)', 'akarai-customer-service' ); ?></label>
                         <label><input type="radio" name="scan_type" value="full"> <?php _e( 'Full Re-scan (Clear & Restart)', 'akarai-customer-service' ); ?></label>
+                        <br>
+                        <label><input type="checkbox" id="ai-mh-deep-scan" value="1"> <?php _e( 'Deep Scan (Full URL Render - Captures Footers/Widgets)', 'akarai-customer-service' ); ?></label>
                     </div>
                 </div>
                 <div id="ai-mh-scan-status-wrapper" style="display:none;" class="mt-15">

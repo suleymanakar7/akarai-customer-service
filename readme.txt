@@ -1,10 +1,10 @@
 === AkarAi Customer Service ===
 Contributors: akarcayazilim, slymn
 Tags: ai, chat, openai, gpt, customer service, analytics, lead generation, rag, semantic search
-Requires at least: 5.0
-Tested up to: 6.4
+Requires at least: 5.8
+Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,7 +22,7 @@ Unlike traditional keyword-based bots, AkarAi uses **Vector Embeddings** to unde
 *   **Advanced Indexing:** Automatically chunks and indexes your Posts, Pages, and Custom Post Types with batch progress tracking.
 *   **Analytics Dashboard:** Visualise token usage, conversation volume, and lead generation trends.
 *   **Lead Generation:** Integrated form to capture visitor names and phones with customizable privacy policy compliance.
-*   **Multi-Language UI:** Force the widget to Turkish or English, or follow the site default.
+*   **Robust Multi-Language:** Fully localized for Turkish and English. Automatically detects site language or allows manual override.
 *   **Premium UI:** Elegant "glassmorphism" Chat Widget design with smooth animations and customizable primary colors.
 *   **Cost Management:** Monitor operational costs based on real-time token usage.
 *   **Manual Knowledge Base:** Directly add facts to the AI's memory for specific business needs.
@@ -43,7 +43,7 @@ Yes, a valid OpenAI API key is required for the chat and embedding features.
 Yes. The chat widget is fully responsive and optimized for mobile interactions.
 
 = Does it support Turkish? =
-Yes, AkarAi fully supports both Turkish and English. You can force the language in the settings.
+Yes, AkarAi fully supports both Turkish and English. It automatically detects your site's language or lets you choose.
 
 == Screenshots ==
 
@@ -52,6 +52,11 @@ Yes, AkarAi fully supports both Turkish and English. You can force the language 
 3. Site Indexing interface with progress tracking.
 
 == Changelog ==
+
+= 1.0.4 =
+*   Fixed: Resolved issue with chat button not opening on some environments.
+*   Improved: Complete localization of the analytics and conversation detail pages.
+*   Improved: Refined dual-language logic for greetings and AI instructions.
 
 = 1.0.3 =
 *   Rebranded as AkarAi Customer Service.

@@ -65,10 +65,12 @@ jQuery(document).ready(function($) {
             const currentId = ids[currentIndex];
             $text.text('Scanning: ' + (currentIndex + 1) + ' / ' + total);
 
+            const isDeepScan = $('#ai-mh-deep-scan').is(':checked');
             $.post(akarai_cs_admin.ajax_url, {
                 action: 'ai_mh_index_batch',
                 nonce: akarai_cs_admin.nonce,
-                post_id: currentId
+                post_id: currentId,
+                deep_scan: isDeepScan
             }, function(response) {
                 const p = Math.round(((currentIndex + 1) / total) * 100);
                 $fill.css('width', p + '%');
@@ -215,4 +217,26 @@ jQuery(document).ready(function($) {
         $('.ai-mh-image-preview').empty();
         $(this).hide();
     });
+
+    // Tab Switching Logic
+    $('.ai-mh-nav-item').on('click', function() {
+        const targetTab = $(this).data('tab');
+        
+        // Update Nav
+        $('.ai-mh-nav-item').removeClass('active');
+        $(this).addClass('active');
+        
+        // Update Content
+        $('.ai-mh-tab-content').removeClass('active');
+        $('#' + targetTab).addClass('active');
+
+        // Optional: Save active tab to localStorage to persist on refresh
+        localStorage.setItem('akarai_active_tab', targetTab);
+    });
+
+    // Restore last active tab
+    const lastTab = localStorage.getItem('akarai_active_tab');
+    if (lastTab && $('#' + lastTab).length) {
+        $(`.ai-mh-nav-item[data-tab="${lastTab}"]`).click();
+    }
 });
